@@ -4,7 +4,7 @@
 #include <ESP8266mDNS.h>
 
 const char* ssid = "WIFI";                   // WRITE YOUR WIFI SSID
-const char* password = "belangdankucan";     // WRITE YOUR WIFI PASSWORD
+const char* password = "123";     // WRITE YOUR WIFI PASSWORD
 const char* web_password = "powersw";         // WRITE SOMETHING SECURE AND RANDOM
 const int relayPin = D1; // Menggunakan pin D1 untuk mengatur relay 
 const int statusPin = D2; // Menggunakan pin D2 untuk membaca status pc
