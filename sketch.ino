@@ -4,8 +4,8 @@
 #include <ESP8266mDNS.h>
 
 const char* ssid = "WIFI";                   // WRITE YOUR WIFI SSID
-const char* password = "123";     // WRITE YOUR WIFI PASSWORD
-const char* web_password = "1f0g9usd1";         // WRITE SOMETHING SECURE AND RANDOM
+const char* password = "belangdankucan";     // WRITE YOUR WIFI PASSWORD
+const char* web_password = "powersw";         // WRITE SOMETHING SECURE AND RANDOM
 const int relayPin = D1; // Menggunakan pin D1 untuk mengatur relay 
 const int statusPin = D2; // Menggunakan pin D2 untuk membaca status pc
 
@@ -15,9 +15,11 @@ ESP8266WebServer server(8085);
 
 const int led = 13;
 
+bool pcStatus = false;
+
 void handleRoot() {
   digitalWrite(led, 1);
-  server.send(200, "text/plain", "halo gaes");
+  server.send(200, "text/plain", "Device Online");
   digitalWrite(led, 0);
 }
 
@@ -78,49 +80,57 @@ void setup(void) {
   server.on("/", handleRoot);
 
   server.on("/statuspc", []() {
-    if (server.arg(0) == web_password) {
-      int ledStatus = digitalRead(statusPin);
-      if (ledStatus == HIGH) {
-        server.send(200, "text/plain", "Device Online");
+      String key = server.arg("key");
+      if (key == web_password) {
+        int ledStatus = digitalRead(statusPin);
+        pcStatus = (ledStatus == HIGH);
+        server.send(200, "text/plain", pcStatus ? "Device Online" : "Device Offline");
       } else {
-        server.send(200, "text/plain", "Device Offline");
+        server.send(403, "text/plain", "Forbidden");
       }
+    });
+
+  server.on("/getstatus", []() {
+    if (server.arg("key") == web_password) {
+      server.send(200, "text/plain", pcStatus ? "Device Online" : "Device Offline");
     } else {
       server.send(403, "text/plain", "Forbidden");
     }
   });
 
   server.on("/short", []() {
-    if (server.arg(0) == web_password) {
+    if (server.arg("key") == web_password) {
       digitalWrite(relayPin, HIGH); // turn on relay with voltage HIGH
       delay(200);              // pause
       digitalWrite(relayPin, LOW);  // turn off relay with voltage LOW
       delay(500);              // pause
       server.send(200, "text/plain", "Button pressed");
     } else {
-      server.send(200, "text/plain", "Button not pressed");
+      server.send(403, "text/plain", "Forbidden");
     }
   });
+
   server.on("/long", []() {
-    if (server.arg(0) == web_password) {
+    if (server.arg("key") == web_password) {
       digitalWrite(relayPin, HIGH); // turn on relay with voltage HIGH
       delay(5000);              // pause
       digitalWrite(relayPin, LOW);  // turn off relay with voltage LOW
       delay(500);              // pause
       server.send(200, "text/plain", "Button pressed");
     } else {
-      server.send(200, "text/plain", "Button not pressed");
+      server.send(403, "text/plain", "Forbidden");
     }
   });
+
   server.on("/ultralong", []() {
-    if (server.arg(0) == web_password) {
+    if (server.arg("key") == web_password) {
       digitalWrite(relayPin, HIGH); // turn on relay with voltage HIGH
       delay(9000);              // pause
       digitalWrite(relayPin, LOW);  // turn off relay with voltage LOW
       delay(500);              // pause
       server.send(200, "text/plain", "Button pressed");
     } else {
-      server.send(200, "text/plain", "Button not pressed");
+      server.send(403, "text/plain", "Forbidden");
     }
   });
 
